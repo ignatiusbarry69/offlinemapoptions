@@ -13,10 +13,18 @@
         <action
             android:id="@+id/action_demoFragment_to_mapsForgeFragment"
             app:destination="@id/mapsForgeFragment" />
+        <action
+            android:id="@+id/action_demoFragment_to_googleMapsFragment"
+            app:destination="@id/googleMapsFragment" />
     </fragment>
     <fragment
         android:id="@+id/mapsForgeFragment"
         android:name="id.co.softorb.app.offinemapoptions.MapsForgeFragment"
         android:label="fragment_maps_forge"
         tools:layout="@layout/fragment_maps_forge" />
+    <fragment
+        android:id="@+id/googleMapsFragment"
+        android:name="id.co.softorb.app.offinemapoptions.GoogleMapsFragment"
+        android:label="fragment_google_maps"
+        tools:layout="@layout/fragment_google_maps" />
 </navigation>

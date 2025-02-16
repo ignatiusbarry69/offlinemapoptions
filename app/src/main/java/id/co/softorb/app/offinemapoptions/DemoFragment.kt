@@ -32,7 +32,7 @@ class DemoFragment : Fragment() {
         binding.toolbar.setOnMenuItemClickListener { menu ->
             when(menu.itemId){
                 R.id.gmap -> {
-                    Snackbar.make(view,"coming soon",Snackbar.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_demoFragment_to_googleMapsFragment)
                     true
                 }
                 R.id.osm -> {
