@@ -9,5 +9,14 @@
     <fragment
         android:id="@+id/demoFragment"
         android:name="id.co.softorb.app.offinemapoptions.DemoFragment"
-        android:label="DemoFragment" />
+        android:label="DemoFragment" >
+        <action
+            android:id="@+id/action_demoFragment_to_mapsForgeFragment"
+            app:destination="@id/mapsForgeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapsForgeFragment"
+        android:name="id.co.softorb.app.offinemapoptions.MapsForgeFragment"
+        android:label="fragment_maps_forge"
+        tools:layout="@layout/fragment_maps_forge" />
 </navigation>

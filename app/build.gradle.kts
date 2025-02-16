@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace = "id.co.softorb.app.offinemapoptions"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "id.co.softorb.app.offinemapoptions"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,4 +50,14 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation ("org.mapsforge:mapsforge-core:0.23.0")
+    implementation ("org.mapsforge:mapsforge-map:0.23.0")
+    implementation ("org.mapsforge:mapsforge-map-reader:0.23.0")
+    implementation ("org.mapsforge:mapsforge-themes:0.23.0")
+    implementation ("org.mapsforge:mapsforge-map-android:0.23.0")
+    implementation ("com.caverock:androidsvg:1.4")
+    implementation ("org.mapsforge:mapsforge-core:0.23.0")
+    implementation ("org.mapsforge:mapsforge-poi:0.23.0")
+    implementation ("org.mapsforge:mapsforge-poi-android:0.23.0")
 }
