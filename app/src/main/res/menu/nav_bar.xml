@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/gmap"
+        android:title="gmap"
+        app:showAsAction="never"/>
+    <item android:id="@+id/osm"
+        android:title="osm"
+        app:showAsAction="never"/>
+    <item android:id="@+id/mapsforge"
+        android:title="mapsforge"
+        app:showAsAction="never"/>
+    <item android:id="@+id/mapbox"
+        android:title="mapbox"
+        app:showAsAction="never"/>
+
+</menu>

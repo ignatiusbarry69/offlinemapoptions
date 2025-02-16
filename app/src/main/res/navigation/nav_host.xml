@@ -6,4 +6,8 @@
     app:startDestination="@id/demoFragment">
 
 
+    <fragment
+        android:id="@+id/demoFragment"
+        android:name="id.co.softorb.app.offinemapoptions.DemoFragment"
+        android:label="DemoFragment" />
 </navigation>
