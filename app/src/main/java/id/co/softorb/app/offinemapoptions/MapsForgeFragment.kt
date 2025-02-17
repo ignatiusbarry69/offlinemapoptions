@@ -171,6 +171,8 @@ class MapsForgeFragment : Fragment() {
 
     companion object{
         private const val LOCATION_REQUEST_CODE = 1001
+        val TUGU = LatLong(-7.7829, 110.3671)
+        val MONAS = LatLong(-6.1754, 106.8272)
         val JAYAPURA = LatLong(-2.5337,140.7181)
         val WAMENA = LatLong(-4.1024, 138.9293)  // Wamena
         val TIMIKA = LatLong(-4.5472, 136.8869)  // Timika

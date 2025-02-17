@@ -1,10 +1,12 @@
 package id.co.softorb.app.offinemapoptions
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.net.Uri
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
@@ -12,6 +14,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
@@ -29,9 +32,26 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
+import id.co.softorb.app.offinemapoptions.MapsForgeFragment.Companion.JAYAPURA
+import id.co.softorb.app.offinemapoptions.MapsForgeFragment.Companion.MONAS
+import id.co.softorb.app.offinemapoptions.MapsForgeFragment.Companion.TUGU
+import id.co.softorb.app.offinemapoptions.MapsForgeFragment.Companion.WAMENA
 import id.co.softorb.app.offinemapoptions.databinding.FragmentDemoBinding
 import id.co.softorb.app.offinemapoptions.databinding.FragmentGoogleMapsBinding
+
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import org.json.JSONObject
+
 import org.mapsforge.core.model.LatLong
+import java.io.IOException
 
 class GoogleMapsFragment : Fragment() {
     private var _binding: FragmentGoogleMapsBinding? = null
@@ -95,8 +115,127 @@ class GoogleMapsFragment : Fragment() {
                 300
             )
         )
+        val origin = TUGU.toLatLng()
+        val destination = MONAS.toLatLng()
+
+//        mMap.addMarker(MarkerOptions().position(origin).title("Start"))
+//        mMap.addMarker(MarkerOptions().position(destination).title("Destination"))
+
+//        getRoute(origin, destination)
+        drawPolyline(origin,destination)
+        binding.btnToMap.setOnClickListener {
+//        openRoute(origin,destination)
+            openNavigation(origin,destination)
+        }
     }
 
+    private fun drawPolyline(start: LatLng, end: LatLng) {
+        val polylineOptions = PolylineOptions()
+            .add(start, end) // Add start and end points
+            .width(8f) // Line thickness
+            .color(Color.BLUE) // Line color
+            .geodesic(true) // Smooth curvature
+
+        mMap.addPolyline(polylineOptions)
+    }
+
+
+    private fun openNavigation(origin: LatLng, destination: LatLng) {
+        val uri = Uri.parse("google.navigation:q=${destination.latitude},${destination.longitude}&mode=d")
+        val mapIntent = Intent(Intent.ACTION_VIEW, uri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+
+        if (mapIntent.resolveActivity(requireActivity().packageManager) != null) {
+            startActivity(mapIntent)
+        } else {
+            Toast.makeText(requireContext(), "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun openRoute(origin: LatLng, destination: LatLng) {
+        val uri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&travelmode=driving")
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        intent.setPackage("com.google.android.apps.maps")
+        startActivity(intent)
+    }
+
+    private fun LatLng.ToString(): String {
+        return StringBuilder().apply {
+            append(latitude)
+            append(",")
+            append(longitude)
+        }.toString()
+    }
+
+    private fun getRoute(origin: LatLng, destination: LatLng) {
+        val call = ApiConfig.apiService.getDirections(
+            origin.ToString(),
+            destination.ToString(),
+            "AIzaSyD-8dBfHFBbCXjcznrhprOSdmY8Gl3L-Gk"
+        )
+        Log.e("xxx", "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.ToString()}&destination=${destination.ToString()}&key=AIzaSyD-8dBfHFBbCXjcznrhprOSdmY8Gl3L-Gk\n")
+
+        call.enqueue(object : retrofit2.Callback<GoogleMapsDirectionsResponse> {
+            override fun onResponse(call: retrofit2.Call<GoogleMapsDirectionsResponse>, response: retrofit2.Response<GoogleMapsDirectionsResponse>) {
+                if (response.isSuccessful) {
+                    val route = response.body()?.routes?.firstOrNull()
+                    val polyline = route?.overviewPolyline?.points
+                    val decodedPolyline = decodePolyline(polyline!!)
+                    if (!polyline.isNullOrEmpty()) {
+                        drawPolyline(decodedPolyline)
+                    }
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<GoogleMapsDirectionsResponse>, t: Throwable) {
+                Log.e("MAPS", "Failed to fetch route: ${t.message}")
+            }
+        })
+    }
+
+    private fun drawPolyline(route: List<LatLng>) {
+        val polylineOptions = PolylineOptions()
+            .addAll(route)
+            .width(8f)
+            .color(Color.BLUE)
+            .geodesic(true)
+
+        mMap.addPolyline(polylineOptions)
+    }
+
+    private fun decodePolyline(encoded: String): List<LatLng> {
+        val poly = ArrayList<LatLng>()
+        var index = 0
+        val len = encoded.length
+        var lat = 0
+        var lng = 0
+
+        while (index < len) {
+            var b: Int
+            var shift = 0
+            var result = 0
+            do {
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lat += dlat
+
+            shift = 0
+            result = 0
+            do {
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lng += dlng
+
+            poly.add(LatLng(lat / 1E5, lng / 1E5))
+        }
+        return poly
+    }
     fun LatLong.toLatLng():LatLng{
         return LatLng(this.latitude,this.longitude)
     }
