@@ -65,4 +65,6 @@ dependencies {
     implementation ("org.mapsforge:mapsforge-poi-android:0.23.0")
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation ("org.osmdroid:osmdroid-android:6.1.20")
 }
